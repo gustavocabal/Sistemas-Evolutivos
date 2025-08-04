@@ -38,7 +38,7 @@ int main() {
 
     vector<vector<int>> populacao = gerar_individuos(pessoas, genes);
 
-    // Teste para cada individuo l
+    // Teste para cada individuo
     for(int i = 0; i < pessoas; i++) {
         cout << "Pessoa " << i + 1 << ": ";
         for(int j = 0; j < genes; j++) {
