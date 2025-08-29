@@ -6,23 +6,37 @@
 
 using namespace std;
 
-vector<vector<float>> gerar_individuos(const int, const int);
-void print_populacao(vector<vector<float>>&, const int, const int);
-void avaliacao(vector<vector<float>>&, const int);
+const int pessoas = 100;
+const int genes = 1;
+const int geracoes = 10;
+
+int melhor_individuo = 0;
+
+vector<vector<float>> gerar_individuos();
+void print_populacao(vector<vector<float>>&);
+void avaliacao(vector<vector<float>>&);
+void crossover(vector<vector<float>>&);
 
 int main() {
-    int pessoas, genes;
-    cout << "Quantos indivíduos haverá inicialmente na população?" << endl;
-    cin >> pessoas;
-    genes = 1;
-    vector<vector<float>> populacao = gerar_individuos(pessoas, genes);
-    print_populacao(populacao, pessoas, genes);
-    avaliacao(populacao, pessoas);
+    srand(time(0));
+    // int pessoas, genes;
+    //cout << "Quantos indivíduos haverá inicialmente na população?" << endl;
+    //cin >> pessoas;
+    
+    vector<vector<float>> populacao = gerar_individuos();
+    print_populacao(populacao);
+    avaliacao(populacao);
+    cout << "\n\n\n CROSSOVER \n\n" << endl;
+    for(int i = 0; i < geracoes; i++) {
+        crossover(populacao);
+    }
+    print_populacao(populacao);
+    avaliacao(populacao);
 
     return 0;
 }
 
-vector<vector<float>> gerar_individuos(const int pessoas, const int genes) {
+vector<vector<float>> gerar_individuos() {
     srand(time(0));
     vector<vector<float>> populacao;
 
@@ -37,9 +51,7 @@ vector<vector<float>> gerar_individuos(const int pessoas, const int genes) {
     return move(populacao);
 }
 
-void print_populacao(vector<vector<float>> &populacao,
-                    const int pessoas, const int genes) 
-{
+void print_populacao(vector<vector<float>> &populacao) {
     for(int i = 0; i < pessoas; i++) {
         cout << "Pessoa " << i + 1 << ": ";
         for(int j = 0; j < genes; j++) {
@@ -50,9 +62,10 @@ void print_populacao(vector<vector<float>> &populacao,
     }
 }
 
-void avaliacao(vector<vector<float>> &populacao, const int pessoas) {
+void avaliacao(vector<vector<float>> &populacao) {
     vector<float> notas;
     const int j = 0; 
+    // FUNÇÃO
     for(int i = 0; i < pessoas; i++) {
         float x = populacao[i][j];
         if(x < 10) {
@@ -63,12 +76,12 @@ void avaliacao(vector<vector<float>> &populacao, const int pessoas) {
         }
     }
 
+    // PRINT DAS NOTAS  
     for(int i = 0; i < pessoas; i++) {
         cout << "Nota pessoa " << i + 1 << ": " << notas[i] << endl;
     }
 
-    int melhor_individuo = 0;
-    for(int i; i < pessoas; i++) {
+    for(int i = 0; i < pessoas; i++) {
         if(notas[melhor_individuo] < notas[i]) {
             melhor_individuo = i;
         }
@@ -76,4 +89,15 @@ void avaliacao(vector<vector<float>> &populacao, const int pessoas) {
 
     cout << "Melhor: " << melhor_individuo + 1 << 
     " || Nota: " << notas[melhor_individuo] << endl;
+}
+
+void crossover(vector<vector<float>> &populacao) {
+    for(int i = 0; i < pessoas; i++) {
+        if(i == melhor_individuo) continue; 
+        populacao[i][0] = (populacao[i][0] + populacao[melhor_individuo][0]) / 2.0;
+
+        // MUTAÇÃO
+        float mut = ((float)(rand() % 100) / 100.0f) * 0.8f - 0.4f;
+        populacao[i][0] = populacao[i][0] + mut;
+    }
 }
