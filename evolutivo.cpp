@@ -2,7 +2,6 @@
 #include <vector>
 #include <ctime>
 #include <cmath>
-#define MUTACAO 0.02
 
 using namespace std;
 
@@ -25,7 +24,7 @@ vector<float> copulacao(vector<float> pai, vector<float> mae) {
     int n = pai.size();
     vector<float> filho;
     for (int i = 0; i < n; i++) {
-        filho.push_back(((pai[i] + mae[i]) / 2.0) * (1 + MUTACAO));
+        filho.push_back( (pai[i] + mae[i]) / 2.0 );
     }
     return move(filho);
 }
@@ -72,7 +71,7 @@ int main() {
     //cout << "Quantos genes em cada pessoa?" << endl;
     //cin >> genes;
     
-    genes = 3;
+    genes = 1;
     vector<vector<float>> populacao = gerar_individuos(pessoas, genes);
 
     // Print de cada individuo
