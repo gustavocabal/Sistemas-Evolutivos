@@ -13,7 +13,7 @@ int main() {
     // Sementeando a engine de forma moderna
     std::random_device rd;                             // tenta obter entropia do SO
     std::mt19937 gen(rd());                            // engine
-    std::uniform_int_distribution<int> dist(0, 19);     // intervalo INCLUSIVO [0,10]
+    std::uniform_int_distribution<int> dist(0, 19);     // intervalo INCLUSIVO [0,19]
 
     for(int i = 0; i < lin; i++) {
         for(int j = 0; j < col; j++) {
