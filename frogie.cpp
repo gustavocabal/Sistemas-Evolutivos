@@ -17,17 +17,16 @@ random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<> dist_weight(1, 100);
 
-vector<int> population;
 vector<float> grade;
 vector<vector<int>> map;
 
-class Frog_pop {
+class Frog {
     public:
         vector<int> movement;
         int position;
 
         //Contructor
-        Frog_pop(vector<int> mov, int pos) {
+        Frog(vector<int> mov, int pos) {
             movement = mov;
             position = pos;
         }
@@ -37,18 +36,27 @@ class Frog_pop {
             int chosen_movement = dist_choice(gen);     // should return a number between 0 and 7 taking their weights in to account
 
             switch (chosen_movement) {
-                case 0: position += 4; break;
-                case 1: position += 3; break;
-                case 2: position += 2; break;
-                case 3: position += 1; break;
-                case 4: position -= 1; break;
-                case 5: position -= 2; break;
-                case 6: position -= 3; break;
-                case 7: position -= 4; break;
+                case 0: position += (map_coluns - 1); break;
+                case 1: position += map_coluns; break;
+                case 2: position += (map_coluns + 1); break;
+                case 3: position -= 1; break;
+                case 4: position += 1; break;
+                case 5: position -= (map_coluns - 1); break;
+                case 6: position -= (map_coluns); break;
+                case 7: position -= (map_coluns + 1); break;
             }
         }
 
+        // operador de impressão
+        friend ostream& operator<<(ostream& os, const Frog& f) {
+            os << "Position: " << f.position << "\n Movements: ";
+            for (int m : f.movement) os << m << " ";
+            os << endl;
+            return os;
+        }
 };
+
+vector<Frog> population;
 
 void create_map(vector<vector<int>> &map) {
     int num = 1;
@@ -83,19 +91,40 @@ vector<int> create_mov() {
     vector<int> mov;
     for (int i = 0; i < 8; i++) {    
         mov.push_back(dist_weight(gen));
-        cout << mov[i] << " ";
+        //cout << mov[i] << " ";
         }
-    cout << endl;
+    //cout << endl;
     return mov;
+
+/*
+    Ordem de movimento)
+        {5, 6, 7,
+         3, _, 4,
+         0, 1, 2}
+*/
+
+
 }
 
+vector<Frog> create_pop() {
+    vector<Frog> pop;
+    for (int i = 0; i < size_pop; i++) {
+        Frog frogie (create_mov(),map_coluns * map_lines / 2);
+        pop.push_back(frogie);
+    }
+    return pop;
+}
 
+void see_pop(vector<Frog> pop) {
+    for (int i = 0; i < size_pop; i++) {
+        cout << pop[i];
+    }
+}
 
 int main() {
     create_map(map);
     //see_map(map);
-    Frog_pop frogie1 (create_mov(),50);
-    frogie1.change_position();
-    cout << "New position: " << frogie1.position << endl;
+    population = create_pop();
+    see_pop(population);
     return 0;
 }
