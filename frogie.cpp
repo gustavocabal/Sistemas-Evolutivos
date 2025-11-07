@@ -16,16 +16,18 @@ using namespace std;
 random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<> dist_weight(1, 100);
+uniform_int_distribution<int> dist(0, 3);
 
-vector<float> grade;
+vector<float> score;
 vector<vector<int>> map;
+vector<vector<char>> emap;
 
 class Frog {
     public:
         vector<int> movement;
         int position;
 
-        //Contructor
+        //Constructor
         Frog(vector<int> mov, int pos) {
             movement = mov;
             position = pos;
@@ -58,7 +60,7 @@ class Frog {
 
 vector<Frog> population;
 
-void create_map(vector<vector<int>> &map) {
+void create_map() {
     int num = 1;
     vector<int> linha;
 
@@ -117,14 +119,55 @@ vector<Frog> create_pop() {
 
 void see_pop(vector<Frog> pop) {
     for (int i = 0; i < size_pop; i++) {
-        cout << pop[i];
+        cout << "Sapo " << i+1 << " - " << pop[i];
     }
 }
 
+void mapa_entidades() {
+    emap.assign(map_lines, vector<char>(map_coluns, ' '));
+
+    for(int i = 0; i < map_lines; i++) {
+        for(int j = 0; j < map_coluns; j++) {
+            int entidade = dist(gen);
+            if(i*j/2 == map_coluns * map_lines / 2) continue;
+            switch(entidade) {
+                case 0:
+                    emap[i][j] = 'M';
+                    break;
+                case 1:
+                    emap[i][j] = 'B';
+                    break;
+                default:
+                    emap[i][j] = ' ';
+                    break;
+            }
+        }
+    }
+
+    // print do mapa real, dps ajustar isso no see_map()
+    int n = 4;
+    for (int z = 0; z < n * 3/2 * map_coluns; z++) { cout << "-"; }
+    cout << endl;
+    for (int i = 0; i < map_lines; i++) {
+        cout << "|";
+        for (int j = 0; j < map_coluns; j++) {
+            cout << setw(n) << emap[i][j] << " |";
+        }
+        cout << endl;
+        for (int k = 0; k < n * 3/2 * map_coluns; k++) { cout << "-"; }
+        cout << endl;
+    }
+
+}
+
 int main() {
-    create_map(map);
+    create_map();
     //see_map(map);
     population = create_pop();
-    see_pop(population);
+    //see_pop(population);
+    for(int i = 0; i < population.size(); i++) {
+        population[i].change_position();
+    }
+    mapa_entidades();
     return 0;
 }
