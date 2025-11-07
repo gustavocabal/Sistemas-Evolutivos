@@ -21,6 +21,7 @@ uniform_int_distribution<int> dist(0, 5);
 vector<float> score;
 vector<vector<int>> map;
 vector<vector<char>> emap;
+int inicial_position = (10*map_lines/2 + map_coluns/2);
 
 class Frog {
     public:
@@ -110,7 +111,7 @@ vector<int> create_mov() {
 vector<Frog> create_pop() {
     vector<Frog> pop;
     for (int i = 0; i < size_pop; i++) {
-        Frog frogie (create_mov(),map_coluns * map_lines / 2);
+        Frog frogie (create_mov(),inicial_position);
         pop.push_back(frogie);
     }
     return pop;
@@ -127,11 +128,12 @@ void see_pop(vector<Frog> pop) {
 // precisamos achar a melhor distribuicao desses itens no mapa
 void mapa_entidades() {
     emap.assign(map_lines, vector<char>(map_coluns, ' '));
+    int num = 0;
 
     for(int i = 0; i < map_lines; i++) {
         for(int j = 0; j < map_coluns; j++) {
             int entidade = dist(gen);
-            if((i+1)*(j+1) == map_coluns * map_lines / 2) {emap[i][j]='S';}
+            if (num == inicial_position) {emap[i][j]='S';}
             else {
                 switch(entidade) {
                     case 0:
@@ -145,6 +147,7 @@ void mapa_entidades() {
                         break;
                 }
             }
+            num++;
         }
     }
 }
