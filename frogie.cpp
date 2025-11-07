@@ -16,7 +16,7 @@ using namespace std;
 random_device rd;
 mt19937 gen(rd());
 uniform_int_distribution<> dist_weight(1, 100);
-uniform_int_distribution<int> dist(0, 3);
+uniform_int_distribution<int> dist(0, 5);
 
 vector<float> score;
 vector<vector<int>> map;
@@ -73,7 +73,7 @@ void create_map() {
     }
 }
 
-void see_map(vector<vector<int>> map) {
+void see_map(vector<vector<char>> map) {
     int n = 4;
     for (int z = 0; z < n * 3/2 * map_coluns; z++) { cout << "-"; }
     cout << endl;
@@ -122,6 +122,9 @@ void see_pop(vector<Frog> pop) {
     }
 }
 
+// na aleatorizacao, eh comum ficarem muitas bombas e moscas colados um nos outros
+// mas se tiverem muitas bombas, fica dificil pros sapos andarem
+// precisamos achar a melhor distribuicao desses itens no mapa
 void mapa_entidades() {
     emap.assign(map_lines, vector<char>(map_coluns, ' '));
 
@@ -144,21 +147,6 @@ void mapa_entidades() {
             }
         }
     }
-
-    // print do mapa real, dps ajustar isso no see_map()
-    int n = 4;
-    for (int z = 0; z < n * 3/2 * map_coluns; z++) { cout << "-"; }
-    cout << endl;
-    for (int i = 0; i < map_lines; i++) {
-        cout << "|";
-        for (int j = 0; j < map_coluns; j++) {
-            cout << setw(n) << emap[i][j] << " |";
-        }
-        cout << endl;
-        for (int k = 0; k < n * 3/2 * map_coluns; k++) { cout << "-"; }
-        cout << endl;
-    }
-
 }
 
 int main() {
@@ -166,9 +154,12 @@ int main() {
     //see_map(map);
     population = create_pop();
     //see_pop(population);
+    mapa_entidades();
+    see_map(emap);
+
+    // logica teste para a mudanca de posicao de todos os sapos
     for(int i = 0; i < population.size(); i++) {
         population[i].change_position();
     }
-    mapa_entidades();
     return 0;
 }
