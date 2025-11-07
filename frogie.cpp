@@ -62,15 +62,14 @@ vector<Frog> population;
 
 void create_map() {
     int num = 1;
-    vector<int> linha;
 
     for (int i = 0; i < map_lines; i++) {
+        vector<int> linha;
         for (int j = 0; j < map_coluns; j++) {
             linha.push_back(num);
             num++;
         }
         map.push_back(linha);
-        linha.clear();
     }
 }
 
@@ -129,17 +128,19 @@ void mapa_entidades() {
     for(int i = 0; i < map_lines; i++) {
         for(int j = 0; j < map_coluns; j++) {
             int entidade = dist(gen);
-            if(i*j/2 == map_coluns * map_lines / 2) continue;
-            switch(entidade) {
-                case 0:
-                    emap[i][j] = 'M';
-                    break;
-                case 1:
-                    emap[i][j] = 'B';
-                    break;
-                default:
-                    emap[i][j] = ' ';
-                    break;
+            if((i+1)*(j+1) == map_coluns * map_lines / 2) {emap[i][j]='S';}
+            else {
+                switch(entidade) {
+                    case 0:
+                        emap[i][j] = 'M';
+                        break;
+                    case 1:
+                        emap[i][j] = 'B';
+                        break;
+                    default:
+                        emap[i][j] = ' ';
+                        break;
+                }
             }
         }
     }
