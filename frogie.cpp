@@ -7,10 +7,11 @@
 
 using namespace std;
 
-#define map_lines 10
-#define map_coluns 10
-#define size_pop 20
+#define map_lines 8
+#define map_coluns 8
+#define size_pop 1
 #define gens 10
+#define leaps 5
 #define mutatation 0.01
 
 random_device rd;
@@ -18,17 +19,21 @@ mt19937 gen(rd());
 uniform_int_distribution<> dist_weight(1, 100);
 uniform_int_distribution<int> dist(0, 5);
 
-vector<float> score;
-vector<vector<int>> map;
-vector<vector<char>> emap;
+vector<float> grade;
+vector<vector<int>> numerical_map;
+vector<vector<char>> visual_map;
 int inicial_position = (10*map_lines/2 + map_coluns/2);
+vector<int> bombs;
+vector<int> flies;
+vector<int> dead;
+int special_frog[2] = {int(inicial_position/map_coluns), inicial_position%map_coluns};
 
 class Frog {
     public:
         vector<int> movement;
         int position;
 
-        //Constructor
+        //Construtor
         Frog(vector<int> mov, int pos) {
             movement = mov;
             position = pos;
@@ -36,7 +41,7 @@ class Frog {
 
         void change_position() {
             discrete_distribution<> dist_choice(movement.begin(), movement.end());
-            int chosen_movement = dist_choice(gen);     // should return a number between 0 and 7 taking their weights in to account
+            int chosen_movement = dist_choice(gen);     // retorna um numero entre 0 e 7 levando seus pesos em consideração
 
             switch (chosen_movement) {
                 case 0: position += (map_coluns - 1); break;
@@ -61,27 +66,69 @@ class Frog {
 
 vector<Frog> population;
 
-void create_map() {
-    int num = 1;
+void create_num_map() {
+    // escolha se a matriz comeca em 0 ou em outro numero
+    int num = 0;
+    vector<int> line;
 
     for (int i = 0; i < map_lines; i++) {
-        vector<int> linha;
         for (int j = 0; j < map_coluns; j++) {
-            linha.push_back(num);
+            line.push_back(num);
             num++;
         }
-        map.push_back(linha);
+        numerical_map.push_back(line);
+        line.clear();
     }
 }
 
-void see_map(vector<vector<char>> map) {
+void create_active_map() {
+    visual_map.assign(map_lines, vector<char>(map_coluns, ' '));
+    int num = 0;
+
+    for(int i = 0; i < map_lines; i++) {
+        for(int j = 0; j < map_coluns; j++) {
+            int entidade = dist(gen);
+            if(num == inicial_position) {visual_map[i][j]='S';}
+            else {
+                switch(entidade) {
+                    case 0:
+                        visual_map[i][j] = 'F';
+                        flies.push_back(map_lines*i + j);
+                        break;
+                    case 1:
+                        visual_map[i][j] = 'B';
+                        bombs.push_back(map_lines*i + j);
+                        break;
+                    default:
+                        visual_map[i][j] = ' ';
+                        break;
+                }
+            }
+            num++;
+        }
+    }
+}
+
+void follow_frog(Frog idol)  {
+    int j = idol.position%map_coluns;
+    int i = int(idol.position/map_coluns);
+
+    // Se quiser apagar a posição anterior do sapo, "descomentarize" essa linha:
+    //visual_map[special_frog[0]][special_frog[1]] = ' ';
+
+    visual_map[i][j] = 'S';
+    special_frog[0] = i;
+    special_frog[1] = j;
+}
+
+void see_map() {
     int n = 4;
     for (int z = 0; z < n * 3/2 * map_coluns; z++) { cout << "-"; }
     cout << endl;
     for (int i = 0; i < map_lines; i++) {
         cout << "|";
         for (int j = 0; j < map_coluns; j++) {
-            cout << setw(n) << map[i][j] << " |";
+            cout << setw(n) << visual_map[i][j] << " |";
         }
         cout << endl;
         for (int k = 0; k < n * 3/2 * map_coluns; k++) { cout << "-"; }
@@ -117,52 +164,47 @@ vector<Frog> create_pop() {
     return pop;
 }
 
-void see_pop(vector<Frog> pop) {
-    for (int i = 0; i < size_pop; i++) {
-        cout << "Sapo " << i+1 << " - " << pop[i];
-    }
-}
-
-// na aleatorizacao, eh comum ficarem muitas bombas e moscas colados um nos outros
-// mas se tiverem muitas bombas, fica dificil pros sapos andarem
-// precisamos achar a melhor distribuicao desses itens no mapa
-void mapa_entidades() {
-    emap.assign(map_lines, vector<char>(map_coluns, ' '));
-    int num = 0;
-
-    for(int i = 0; i < map_lines; i++) {
-        for(int j = 0; j < map_coluns; j++) {
-            int entidade = dist(gen);
-            if (num == inicial_position) {emap[i][j]='S';}
-            else {
-                switch(entidade) {
-                    case 0:
-                        emap[i][j] = 'M';
-                        break;
-                    case 1:
-                        emap[i][j] = 'B';
-                        break;
-                    default:
-                        emap[i][j] = ' ';
-                        break;
+void moving() {
+    vector<long unsigned int> death;
+    bool skip;
+    for (int z = 0; z < leaps; z++) {
+        for (long unsigned int i = 0; i < population.size(); i++) {
+            skip = false;
+            for (long unsigned int w = 0; w < death.size(); w++) {if (death.at(w) == i) {skip = true;}}
+            if (skip == true) {continue;}
+            population.at(i).change_position();
+            for (long unsigned int j = 0; j < bombs.size(); j++) {
+                if (population.at(i).position == bombs.at(j)) {
+                    death.push_back(i);
                 }
             }
-            num++;
+            cout << population[i];
+            follow_frog(population[i]);
+            see_map();
         }
+    }
+    /* 
+    Cada sapo se move uma quantidade "leaps" de vezes
+    Se a posição que o sapo parou tiver uma bomba, ele não se mexe mais
+    -- o vetor "death" guarda o index dos sapos que encontraram bombas
+    */
+}
+
+void see_pop(vector<Frog> pop) {
+    for (int i = 0; i < size_pop; i++) {
+        cout << pop[i];
     }
 }
 
 int main() {
-    create_map();
-    //see_map(map);
+    create_num_map();
+    create_active_map();
+    see_map();
+    cout << "Bombs: ";
+    for (long unsigned int i = 0; i < bombs.size(); i++) {cout << bombs.at(i) << " ";}
+    cout << endl;
     population = create_pop();
-    //see_pop(population);
-    mapa_entidades();
-    see_map(emap);
-
-    // logica teste para a mudanca de posicao de todos os sapos
-    for(int i = 0; i < population.size(); i++) {
-        population[i].change_position();
-    }
+    see_pop(population);
+    moving();
     return 0;
 }
