@@ -3,7 +3,6 @@
 
 using namespace std;
 
-// Implementação do Construtor
 Frog::Frog(vector<int> mov, int pos) {
     movement = mov;
     position = pos;
@@ -12,17 +11,14 @@ Frog::Frog(vector<int> mov, int pos) {
     vivo = true;
 }
 
-// Implementação do Pulo
 void Frog::jump() {
     if (!vivo) return;
 
-    // Usa os pesos do genoma para escolher a direção
     discrete_distribution<> dist_choice(movement.begin(), movement.end());
-    int chosen_movement = dist_choice(gen); // Usa o 'gen' global
+    int chosen_movement = dist_choice(gen);
 
     int old_pos = position;
 
-    // Lógica de Movimento
     switch (chosen_movement) {
         case 0: position += (MAP_COLS - 1); break;
         case 1: position += MAP_COLS; break;
@@ -34,13 +30,11 @@ void Frog::jump() {
         case 7: position -= (MAP_COLS + 1); break;
     }
 
-    // Proteção de Borda (Se sair do mapa, volta para onde estava)
     if (position < 0 || position >= MAP_LINES * MAP_COLS) {
         position = old_pos;
     }
 }
 
-// Implementação da Comparação (para o Ranking)
 bool Frog::operator<(const Frog& other) const {
-    return fitness > other.fitness; // Do maior para o menor
+    return fitness > other.fitness;
 }

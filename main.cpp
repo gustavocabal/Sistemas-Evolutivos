@@ -7,13 +7,11 @@
 
 using namespace std;
 
-// --- CONFIGURAÇÕES DO AG ---
 const int SIZE_POP = 100;
 const int GENS = 50;
 const int LEAPS = 20;
 const int MUTATION_RATE = 5;
 
-// --- GLOBAIS ---
 random_device rd;
 mt19937 gen(rd()); 
 uniform_int_distribution<> dist_weight(1, 100);
@@ -22,7 +20,6 @@ vector<int> bombs;
 vector<int> flies;
 int inicial_position = (10 * MAP_LINES / 2 + MAP_COLS / 2);
 
-// --- FUNÇÕES AUXILIARES ---
 
 void setup_map() {
     bombs.clear();
@@ -89,7 +86,6 @@ Frog crossover(const Frog& pai, const Frog& mae) {
     return Frog(dna_filho, inicial_position);
 }
 
-// --- MAIN ---
 
 int main() {
     setup_map();

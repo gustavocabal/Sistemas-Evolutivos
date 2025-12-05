@@ -4,17 +4,13 @@
 #include <vector>
 #include <random>
 
-// --- CONSTANTES GERAIS ---
-// Definimos aqui para que todo mundo saiba o tamanho do mapa
 const int MAP_LINES = 8;
 const int MAP_COLS = 8;
 
-// Declaramos que existe um gerador aleatório global (definido no main)
 extern std::mt19937 gen;
 
 class Frog {
 public:
-    // Atributos
     std::vector<int> movement; // Genoma (pesos)
     int position;
     
