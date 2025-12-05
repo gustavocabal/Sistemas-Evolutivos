@@ -27,11 +27,16 @@ vector<int> bombs;
 vector<int> flies;
 vector<int> dead;
 int special_frog[2] = {int(inicial_position/map_coluns), inicial_position%map_coluns};
+vector<float> score;
+int MELHOR_DE_TODOS;
 
 class Frog {
     public:
         vector<int> movement;
         int position;
+        int moscas = 0;
+        int buracos = 0;
+        int bombas = 0;
 
         //Construtor
         Frog(vector<int> mov, int pos) {
@@ -92,15 +97,15 @@ void create_active_map() {
             else {
                 switch(entidade) {
                     case 0:
-                        visual_map[i][j] = 'F';
+                        visual_map[i][j] = 'F'; //mosca
                         flies.push_back(map_lines*i + j);
                         break;
                     case 1:
-                        visual_map[i][j] = 'B';
+                        visual_map[i][j] = 'B'; //buraco
                         bombs.push_back(map_lines*i + j);
                         break;
                     default:
-                        visual_map[i][j] = ' ';
+                        visual_map[i][j] = ' '; //nada
                         break;
                 }
             }
@@ -113,8 +118,8 @@ void follow_frog(Frog idol)  {
     int j = idol.position%map_coluns;
     int i = int(idol.position/map_coluns);
 
-    // Se quiser apagar a posição anterior do sapo, "descomentarize" essa linha:
-    //visual_map[special_frog[0]][special_frog[1]] = ' ';
+    // Comentar a linha abaixo para apagar (ou nao) o sapo a cada movimento
+    visual_map[special_frog[0]][special_frog[1]] = ' ';
 
     visual_map[i][j] = 'S';
     special_frog[0] = i;
@@ -196,6 +201,25 @@ void see_pop(vector<Frog> pop) {
     }
 }
 
+void avaliarsapos(const int saltos) {
+    float a = 2; //Peso das moscas
+    float b = 0.7; //Peso ciclos-buracos
+
+    for(int i=0; i<population.size(); i++) {
+        float nota = 0;
+        nota = a*population[i].moscas + b*(saltos-population[i].buracos)*(1-population[i].bombas);
+        score.push_back(nota);
+        if(i == 0) {
+            MELHOR_DE_TODOS = i;
+        }
+        else {
+            if (score[i] > score[MELHOR_DE_TODOS]) {
+                MELHOR_DE_TODOS = i;
+            }
+        }
+    }
+}
+
 int main() {
     create_num_map();
     create_active_map();
@@ -205,6 +229,19 @@ int main() {
     cout << endl;
     population = create_pop();
     see_pop(population);
-    moving();
+
+    int saltos = 0;      
+    int geracao = 0;  
+    do {
+        if(saltos % 5 == 0) {
+            avaliarsapos(saltos);
+            cout << MELHOR_DE_TODOS << endl;
+            geracao++;
+        }
+
+        moving();
+        saltos++;
+    } while(true);
+
     return 0;
 }
