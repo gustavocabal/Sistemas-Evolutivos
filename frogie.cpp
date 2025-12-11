@@ -34,6 +34,7 @@ class Frog {
     public:
         vector<int> movement;
         int position;
+        int orientacao; // Norte, sul, leste, oeste
         int moscas = 0;
         int buracos = 0;
         int bombas = 0;
@@ -101,7 +102,7 @@ void create_active_map() {
                         flies.push_back(map_lines*i + j);
                         break;
                     case 1:
-                        visual_map[i][j] = 'B'; //buraco
+                        visual_map[i][j] = 'B'; //bomba
                         bombs.push_back(map_lines*i + j);
                         break;
                     default:
@@ -168,6 +169,29 @@ vector<Frog> create_pop() {
     }
     return pop;
 }
+
+/*void visao(int i) {
+    switch (population[i].orientacao) {
+    case 0: // Cima
+        int CE = population[i].position -(map_coluns - 1);
+        if() {
+
+        }
+        break;
+    case 1: // Direita
+        
+        break;
+    case 2: // Baixo
+        
+        break;
+    case 3: // Esquerda
+
+        break;
+    
+    default:
+        break;
+    }
+}*/
 
 void moving() {
     vector<long unsigned int> death;
