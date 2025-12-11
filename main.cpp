@@ -3,176 +3,282 @@
 #include <algorithm>
 #include <iomanip>
 #include <random>
-#include "Sapo.h" 
+#include <cmath>
 
 using namespace std;
 
-const int SIZE_POP = 100;
-const int GENS = 1000;       
-const int LEAPS = 20;       
+// --- CONFIGURAÇÕES ---
+#define MAPA_LINHAS 20
+#define MAPA_COLUNAS 20
+#define GENES 7
+#define TAMANHO_POP 100    
+#define GERACOES 1000
+#define TURNOS_POR_GERACAO 25 
 
+// --- GLOBAIS DE ALEATORIEDADE E MAPA ---
 random_device rd;
-mt19937 gen(rd()); 
+mt19937 gen(rd());
 uniform_int_distribution<> dist_weight(1, 100);
+uniform_int_distribution<int> dist_entidades(0, 19);
+uniform_int_distribution<int> dist_orientacao(0, 3);
 
-vector<int> bombs;
-vector<int> flies;
-int inicial_position = (10 * MAP_LINES / 2 + MAP_COLS / 2); 
+struct Coord {
+    int x;
+    int y;
+    bool operator==(const Coord& other) const { return x == other.x && y == other.y; }
+};
 
-void setup_map() {
-    bombs.clear();
-    flies.clear();
-    uniform_int_distribution<int> dist_entity(0, 100);
+Coord pos_inicial = {0, 2}; 
+vector<vector<char>> visual_map;
 
-    for (int i = 0; i < MAP_LINES * MAP_COLS; i++) {
-        if (i == inicial_position) continue;
-        int chance = dist_entity(gen);
-        if (chance < 10) flies.push_back(i);      
-        else if (chance < 15) bombs.push_back(i); 
+// Tabelas de visão (constantes)
+static const int vf_x[4] = {-1, 0, +1,  0};
+static const int vf_y[4] = { 0,+1,  0, -1};
+static const int vfe_x[4] = {-1,-1,+1,+1};
+static const int vfe_y[4] = {-1,+1,+1,-1};
+static const int vfd_x[4] = {-1,+1,+1,-1};
+static const int vfd_y[4] = {+1,+1,-1,-1};
+
+// --- CLASSE SAPO ---
+class Frog {
+public:
+    vector<int> movimento;      
+    vector<int> movimento_real; 
+    Coord pos;
+    int orientacao; 
+
+    bool vivo = true;
+    float fitness = -1.0f; // Começa negativo
+    int moscas_comidas = 0;
+    int bombas_pisadas = 0;
+    int valas_pisadas = 0;
+
+    // Visão
+    Coord vista_frente, vista_fe, vista_fd;
+    bool ve_bomba_frente = false, ve_bomba_fe = false, ve_bomba_fd = false;
+    bool ve_mosca_frente = false, ve_mosca_fe = false, ve_mosca_fd = false;
+    bool ve_vala_frente  = false, ve_vala_fe  = false, ve_vala_fd  = false;
+
+    // Construtor
+    Frog(vector<int> mov, Coord p, int orient) {
+        movimento = mov;
+        pos = p;
+        orientacao = orient;
     }
-}
 
-void simulate_generation(vector<Frog>& pop) {
-    for (auto& frog : pop) {
-        vector<int> local_flies = flies; 
-        frog.moscas_comidas = 0;
-        frog.vivo = true;
-        frog.position = inicial_position; 
-        int turnos_vividos = 0;
+    // Operador necessário para o sort
+    bool operator<(const Frog& other) const {
+        return fitness > other.fitness;
+    }
 
-        for (int k = 0; k < LEAPS; k++) {
-            if (!frog.vivo) break;
+    void definir_movimento(vector<int>& mov2) {
+        movimento_real = mov2;
+    }
 
-            frog.jump();
-            turnos_vividos++;
+    // A lógica antiga de 'jump' agora é esta função complexa
+    void change_position() {
+        if (!vivo) return;
+        discrete_distribution<> dist_choice(movimento_real.begin(), movimento_real.end());
+        int mv = dist_choice(gen);
 
-            // Verifica Bomba
-            for (int b : bombs) {
-                if (frog.position == b) {
-                    frog.vivo = false;
-                    break;
-                }
-            }
-            
-            // Verifica Mosca
-            if (frog.vivo) {
-                for (size_t f = 0; f < local_flies.size(); f++) {
-                    if (frog.position == local_flies[f]) {
-                        frog.moscas_comidas++;
-                        local_flies[f] = local_flies.back();
-                        local_flies.pop_back();
-                        break;
-                    }
-                }
-            }
+        int dx = 0, dy = 0;
+        static const int step_x[] = {-1, 0, +1, 0};
+        static const int step_y[] = { 0, +1, 0, -1};
+
+        switch (mv) {
+        case 0: case 1: case 2: case 3: case 6: 
+            dx = step_x[orientacao];
+            dy = step_y[orientacao];
+            break;
+        case 4: 
+            orientacao = (orientacao == 3) ? 0 : orientacao + 1;
+            break; 
+        case 5: 
+            orientacao = (orientacao == 0) ? 3 : orientacao - 1;
+            break; 
+        default: break;
         }
-        // Fitness
-        float bonus_vida = frog.vivo ?  50.0f: 0.0f;
-        frog.fitness = (1000.0f * frog.moscas_comidas) + bonus_vida + turnos_vividos;
+
+        int nx = pos.x + dx;
+        int ny = pos.y + dy;
+
+        if (nx >= 0 && nx < MAPA_LINHAS && ny >= 0 && ny < MAPA_COLUNAS) {
+            pos.x = nx;
+            pos.y = ny;
+            char terreno = visual_map[nx][ny];
+            
+            if (terreno == 'B') { vivo = false; bombas_pisadas++; }
+            else if (terreno == 'M') { moscas_comidas++; }
+            else if (terreno == 'V') { valas_pisadas++; }
+        }
+    }
+};
+
+// --- VARIÁVEL GLOBAL DO MELHOR SAPO ---
+Frog global_best(vector<int>(GENES, 0), pos_inicial, 0);
+
+// --- FUNÇÕES AUXILIARES ---
+
+void criar_mapa() {
+    visual_map.assign(MAPA_LINHAS, vector<char>(MAPA_COLUNAS, ' '));
+    for (int i = 0; i < MAPA_LINHAS; i++) {
+        for (int j = 0; j < MAPA_COLUNAS; j++) {
+            if (i == pos_inicial.x && j == pos_inicial.y) { visual_map[i][j] = 'S'; continue; }
+            int e = dist_entidades(gen);
+            if (e == 0)            visual_map[i][j] = 'M';
+            else if (e > 0 && e<5) visual_map[i][j] = 'B';
+            else if (e == 5)       visual_map[i][j] = 'V';
+            else                   visual_map[i][j] = ' ';
+        }
     }
 }
 
-// --- Crossover (com taxa de mutação variável) ---
+void atualizar_visao(vector<Frog>& pop) {
+    for (auto &f : pop) {
+        if (!f.vivo) continue;
+        int o = f.orientacao;
+        f.vista_frente = { f.pos.x + vf_x[o], f.pos.y + vf_y[o] };
+        f.vista_fe     = { f.pos.x + vfe_x[o], f.pos.y + vfe_y[o] };
+        f.vista_fd     = { f.pos.x + vfd_x[o], f.pos.y + vfd_y[o] };
+        
+        f.ve_bomba_frente = f.ve_bomba_fe = f.ve_bomba_fd = false;
+        f.ve_mosca_frente = f.ve_mosca_fe = f.ve_mosca_fd = false;
+        f.ve_vala_frente  = f.ve_vala_fe  = f.ve_vala_fd  = false;
+
+        auto check = [&](Coord c, bool& b, bool& m, bool& v) {
+            if (c.x >= 0 && c.x < MAPA_LINHAS && c.y >= 0 && c.y < MAPA_COLUNAS) {
+                char ch = visual_map[c.x][c.y];
+                if (ch == 'B') b = true; if (ch == 'M') m = true; if (ch == 'V') v = true;
+            }
+        };
+        check(f.vista_frente, f.ve_bomba_frente, f.ve_mosca_frente, f.ve_vala_frente);
+        check(f.vista_fe, f.ve_bomba_fe, f.ve_mosca_fe, f.ve_vala_fe);
+        check(f.vista_fd, f.ve_bomba_fd, f.ve_mosca_fd, f.ve_vala_fd);
+    }
+}
+
+void executar_movimento(vector<Frog>& pop) {
+    for(auto &f : pop) {
+        if(!f.vivo) continue;
+        int contador = 0;
+        bool vetor_auxiliar[7] = {1, 0, 0, 0, 1, 1, 1}; 
+
+        if(f.ve_mosca_fe || f.ve_mosca_frente || f.ve_mosca_fd) { vetor_auxiliar[1] = 1; contador++; }
+        if(f.ve_vala_fe ||f.ve_vala_frente || f.ve_vala_fd)     { vetor_auxiliar[2] = 1; contador++; }
+        if(f.ve_bomba_fe || f.ve_bomba_frente || f.ve_bomba_fd) { vetor_auxiliar[3] = 1; contador++; }
+        
+        if(contador >= 3) vetor_auxiliar[0] = 0; 
+
+        vector<int> mov_calc(GENES);
+        for(int i = 0; i < GENES; i++) mov_calc[i] = vetor_auxiliar[i] * f.movimento[i];
+        f.definir_movimento(mov_calc);
+        f.change_position();
+    }
+}
+
+void simular_geracao(vector<Frog>& pop) {
+    for(auto& f : pop) {
+        f.pos = pos_inicial;
+        f.vivo = true;
+        f.moscas_comidas = 0;
+        f.bombas_pisadas = 0;
+        f.valas_pisadas = 0;
+        f.orientacao = dist_orientacao(gen);
+    }
+
+    for(int i=0; i < TURNOS_POR_GERACAO; i++) {
+        atualizar_visao(pop);
+        executar_movimento(pop);
+    }
+
+    for(auto& f : pop) {
+        float fit = (f.moscas_comidas * 100.0f);
+        if (f.vivo) fit += 20.0f; else fit -= 50.0f;
+        fit -= (f.valas_pisadas * 10.0f); 
+        f.fitness = (fit < 0) ? 0 : fit;
+    }
+}
+
 Frog crossover(const Frog& pai, const Frog& mae, int mutation_rate) {
     vector<int> dna_filho;
     uniform_int_distribution<int> moeda(0, 1);
-    
-    for(int i = 0; i < 8; i++) {
-        if (moeda(gen) == 0) dna_filho.push_back(pai.movement[i]);
-        else                 dna_filho.push_back(mae.movement[i]);
+    for(int i = 0; i < GENES; i++) {
+        if (moeda(gen) == 0) dna_filho.push_back(pai.movimento[i]);
+        else                 dna_filho.push_back(mae.movimento[i]);
     }
-    
-    // Mutação usando a taxa passada como argumento
     uniform_int_distribution<int> d100(0, 100);
-    uniform_int_distribution<int> d_gene(0, 7); 
-
     if (d100(gen) < mutation_rate) { 
-        int idx = d_gene(gen);
-        dna_filho[idx] = dist_weight(gen); 
+        uniform_int_distribution<int> d_gene(0, GENES - 1);
+        dna_filho[d_gene(gen)] = dist_weight(gen);
     }
-
-    return Frog(dna_filho, inicial_position);
+    return Frog(dna_filho, pos_inicial, 0);
 }
 
-// --- Torneio ---
-Frog tournament_selection(const vector<Frog>& pop) {
+Frog torneio(const vector<Frog>& pop) {
     uniform_int_distribution<int> dist_idx(0, pop.size() - 1);
-    
-    // Sorteia índice inicial
-    int best_idx = dist_idx(gen);
-    
-    // Faz 2 desafios (Torneio de tamanho 3)
-    for (int i = 0; i < 2; i++) {
-        int contender_idx = dist_idx(gen);
-        if (pop[contender_idx].fitness > pop[best_idx].fitness) {
-            best_idx = contender_idx;
-        }
+    int best = dist_idx(gen);
+    for(int i=0; i<2; i++) { 
+        int adv = dist_idx(gen);
+        if(pop[adv].fitness > pop[best].fitness) best = adv;
     }
-    return pop[best_idx]; // Retorna cópia do vencedor
+    return pop[best];
 }
 
 int main() {
-    setup_map();
+    criar_mapa();
+    cout << "Mapa criado!" << endl;
 
-    // 1. População Inicial
     vector<Frog> population;
-    for (int i = 0; i < SIZE_POP; i++) {
-        vector<int> random_mov;
-        for(int j=0; j<8; j++) random_mov.push_back(dist_weight(gen));
-        population.push_back(Frog(random_mov, inicial_position));
+    for (int i = 0; i < TAMANHO_POP; i++) {
+        vector<int> dna(GENES);
+        for(int j=0; j<GENES; j++) dna[j] = dist_weight(gen);
+        population.push_back(Frog(dna, pos_inicial, dist_orientacao(gen)));
     }
+    
+    // Inicializa o global best com um dummy
+    global_best = population[0];
+    global_best.fitness = -1.0f;
 
-    cout << "Mapa criado! Moscas: " << flies.size() << " | Bombas: " << bombs.size() << endl;
+    int taxa_mutacao = 5;
 
-    float last_best_fitness = -1.0f;
-    int stagnation_count = 0;
-    int current_mutation = 5; 
-
-    // 2. Loop Evolutivo
-    for (int g = 0; g < GENS; g++) {
-        simulate_generation(population);
+    for (int g = 0; g < GERACOES; g++) {
+        simular_geracao(population);
         sort(population.begin(), population.end());
 
-        // Controle de Estagnação (Mutação Adaptativa)
-        if (population[0].fitness > last_best_fitness) {
-            last_best_fitness = population[0].fitness;
-            stagnation_count = 0;
-            current_mutation = 5; // Reseta mutação para 5%
-        } else {
-            stagnation_count++;
+        // --- LÓGICA DO MELHOR GLOBAL ---
+        if (population[0].fitness > global_best.fitness) {
+            global_best = population[0];
         }
 
-        // Se travou por 10 gerações, aumenta mutação
-        if (stagnation_count > 10) {
-            current_mutation = 50; 
-        }
-
-        if (g % 5 == 0 || g == GENS - 1) {
+        if (g % 20 == 0 || g == GERACOES - 1) {
             cout << "Gen " << setw(3) << g 
-                 << " | Best Fit: " << setw(4) << population[0].fitness
-                 << " | Moscas: " << population[0].moscas_comidas
-                 << " | Mutacao: " << setw(2) << current_mutation << "%" 
-                 << " | Vivo: " << (population[0].vivo ? "S" : "N") << endl;
+                 << " | Atual Fit: " << setw(4) << population[0].fitness
+                 << " | GLOBAL BEST: " << setw(4) << global_best.fitness 
+                 << " | Mutacao: " << taxa_mutacao << "%" << endl;
         }
+
+        // Mutação dinâmica
+        if (global_best.fitness > population[0].fitness * 1.5) taxa_mutacao = 20;
+        else taxa_mutacao = 5;
 
         vector<Frog> next_gen;
-        // Elitismo: Salva o Top 1
-        next_gen.push_back(population[0]); 
+        
+        // --- SUPER ELITISMO ---
+        next_gen.push_back(global_best); 
 
-        // Restante por Torneio + Crossover
-        while(next_gen.size() < SIZE_POP) {
-            Frog pai = tournament_selection(population);
-            Frog mae = tournament_selection(population);
-            next_gen.push_back(crossover(pai, mae, current_mutation));
+        while(next_gen.size() < TAMANHO_POP) {
+            Frog p1 = torneio(population);
+            Frog p2 = torneio(population);
+            next_gen.push_back(crossover(p1, p2, taxa_mutacao));
         }
         population = next_gen;
-    
     }
 
     cout << "\n--- RESULTADO FINAL ---" << endl;
-    cout << "Melhor Sapo comeu " << population[0].moscas_comidas << " moscas." << endl;
-    cout << "DNA do Campeao: ";
-    for(int w : population[0].movement) cout << w << " ";
+    cout << "Melhor Sapo da Historia comeu " << global_best.moscas_comidas << " moscas." << endl;
+    cout << "Fitness Final: " << global_best.fitness << endl;
+    cout << "DNA Campeao: ";
+    for(int w : global_best.movimento) cout << w << " ";
     cout << endl;
 
     return 0;
