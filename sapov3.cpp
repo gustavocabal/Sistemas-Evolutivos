@@ -5,14 +5,21 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <thread>
+#include <chrono>
 
 using namespace std;
 
 #define MAPA_LINHAS 20
 #define MAPA_COLUNAS 20
 #define GENES 7
-#define SALTOS_POR_GERACAO 5
+#define SALTOS_POR_GERACAO 20
 #define TAMANHO_POP 10
+#define CHANCE_MUTACAO 20
+#define MUTACAO_INICIAL 4
 
 // "Aleatorização" de dados
 random_device rd;
@@ -26,14 +33,19 @@ struct Coord {
     int y;
 };
 
-Coord pos_inicial = {0,2};//{MAPA_LINHAS/2, MAPA_COLUNAS/2}; // mudar depois pra ser aletorio
+Coord pos_inicial = {MAPA_LINHAS/2, MAPA_COLUNAS/2}; // mudar depois pra ser aletorio
 Coord pos_melhor_sapo = pos_inicial;
 vector<vector<char>> visual_map;
+vector<vector<char>> visual_map_base; 
 vector<Coord> bombas;
 vector<Coord> moscas;
 vector<Coord> valas;
 vector<float> score;
 int MELHOR_DE_TODOS = 0;
+
+float melhor_fitness_antigo = -1.0f;
+int contador_estagnacao = 0;
+int taxa_de_mutacao = MUTACAO_INICIAL; 
 
 static const int movx[9] = {+1,+1,+1, 0, 0, 0,-1,-1,-1};
 static const int movy[9] = {-1, 0,+1,-1, 0,+1,-1, 0,+1};
@@ -58,6 +70,7 @@ public:
     vector<int> movimento_real;
     Coord pos;
     int orientacao;
+    bool vivo = true;
 
     int qtd_moscas = 0;
     int qtd_valas = 0;
@@ -98,44 +111,160 @@ public:
         int dx = 0;
         int dy = 0;
 
-        switch (mv) { //Ações do sapo
-        case 0: // Pula para o espaço vazio
-            
-            break; 
-        case 1: // Pula para a mosca
-            
-            break;
-        case 2: // Pula para a vala
-            
-            break;
-        case 3: // Pula para a bomba
-            
-            break;
+        switch (mv) {
 
-        case 4: // Gira pra direita
-            if (orientacao == 3) {
-                orientacao = 0;
-            }
-            else {
-                orientacao += 1;
-            }      
-            dx = movx[4];
-            dy = movy[4];
-            break;
+            case 0: // Pula para o espaço vazio
+            {
+                vector<Coord> opcoes;
+                
+                // Checa Esquerda
+                if (vista_fe.x >= 0 && vista_fe.x < MAPA_LINHAS && 
+                    vista_fe.y >= 0 && vista_fe.y < MAPA_COLUNAS && 
+                    visual_map[vista_fe.x][vista_fe.y] == ' ')
+                {
+                    opcoes.push_back(vista_fe);
+                }
 
-        case 5: // Gira pra esquerda
-            if (orientacao == 0) {
-                orientacao = 3;
+                // Checa Frente
+                if (vista_frente.x >= 0 && vista_frente.x < MAPA_LINHAS && 
+                    vista_frente.y >= 0 && vista_frente.y < MAPA_COLUNAS && 
+                    visual_map[vista_frente.x][vista_frente.y] == ' ')
+                {
+                    opcoes.push_back(vista_frente);
+                }
+
+                // Checa Direita
+                if (vista_fd.x >= 0 && vista_fd.x < MAPA_LINHAS && 
+                    vista_fd.y >= 0 && vista_fd.y < MAPA_COLUNAS && 
+                    visual_map[vista_fd.x][vista_fd.y] == ' ')
+                {
+                    opcoes.push_back(vista_fd);
+                }
+
+                if (!opcoes.empty()) {
+                    uniform_int_distribution<> pick(0, opcoes.size()-1);
+                    Coord destino = opcoes[pick(gen)];
+                    dx = destino.x - pos.x;
+                    dy = destino.y - pos.y;
+                }
+                break;
             }
-            else {
-                orientacao -= 1;
+
+            case 1: // Pula para a mosca
+            {
+                vector<Coord> opcoes;
+
+                if (ve_mosca_fe)
+                    opcoes.push_back(vista_fe);
+
+                if (ve_mosca_frente)
+                    opcoes.push_back(vista_frente);
+
+                if (ve_mosca_fd)
+                    opcoes.push_back(vista_fd);
+
+                if (!opcoes.empty()) {
+                    uniform_int_distribution<> pick(0, opcoes.size()-1);
+                    Coord destino = opcoes[pick(gen)];
+                    dx = destino.x - pos.x;
+                    dy = destino.y - pos.y;
+                }
+                break;
             }
-            dx = movx[4];
-            dy = movy[4];
-            break;
+
+            case 2: // Pula para a vala
+            {
+                vector<Coord> opcoes;
+
+                if (ve_vala_fe)
+                    opcoes.push_back(vista_fe);
+
+                if (ve_vala_frente)
+                    opcoes.push_back(vista_frente);
+
+                if (ve_vala_fd)
+                    opcoes.push_back(vista_fd);
+
+                if (!opcoes.empty()) {
+                    uniform_int_distribution<> pick(0, opcoes.size()-1);
+                    Coord destino = opcoes[pick(gen)];
+                    dx = destino.x - pos.x;
+                    dy = destino.y - pos.y;
+                }
+                break;
+            }
+
+            case 3: // Pula para a bomba
+            {
+                vector<Coord> opcoes;
+
+                if (ve_bomba_fe)
+                    opcoes.push_back(vista_fe);
+
+                if (ve_bomba_frente)
+                    opcoes.push_back(vista_frente);
+
+                if (ve_bomba_fd)
+                    opcoes.push_back(vista_fd);
+
+                if (!opcoes.empty()) {
+                    uniform_int_distribution<> pick(0, opcoes.size()-1);
+                    Coord destino = opcoes[pick(gen)];
+                    dx = destino.x - pos.x;
+                    dy = destino.y - pos.y;
+                }
+                break;
+            }
+
+            case 4: // Gira pra direita
+                if (orientacao == 3) {
+                    orientacao = 0;
+                }
+                else {
+                    orientacao += 1;
+                }      
+                dx = movx[4];
+                dy = movy[4];
+                break;
+
+            case 5: // Gira pra esquerda
+                if (orientacao == 0) {
+                    orientacao = 3;
+                }
+                else {
+                    orientacao -= 1;
+                }
+                dx = movx[4];
+                dy = movy[4];
+                break;
 
         default: // Pula pra um espaço fora do campo de visão
-            
+            if (orientacao == 0) {
+                uniform_int_distribution<> pick(0, 5);
+                int idx = pick(gen);
+                dx = movx[idx];
+                dy = movy[idx];
+            }
+            if (orientacao == 1) {
+                std::vector<int> permitidos = {0, 1, 3, 4, 6, 7};  
+                std::uniform_int_distribution<> pick(0, permitidos.size() - 1);
+                int idx = permitidos[pick(gen)];
+                dx = movx[idx];
+                dy = movy[idx];
+            }
+            if (orientacao == 2) {
+                uniform_int_distribution<> pick(3, 8);
+                int idx = pick(gen);
+                dx = movx[idx];
+                dy = movy[idx];
+            }
+            if (orientacao == 3) {
+                std::vector<int> permitidos = {1, 2, 4, 5, 7, 8}; 
+                std::uniform_int_distribution<> pick(0, permitidos.size() - 1);
+                int idx = permitidos[pick(gen)];
+                dx = movx[idx];
+                dy = movy[idx];
+            }
             break;
         }
 
@@ -147,8 +276,13 @@ public:
             pos.x = nx;
             pos.y = ny;
         }
-        else {
-            change_position(); // Pode causar um loop infinito, mas pouco provavel
+        else { // Gira o sapo pra direita se ele quiser se mover pra uma borda
+            if (orientacao == 3) {
+                orientacao = 0;
+            }
+            else {
+                orientacao += 1;
+            }      
         }
     }
 
@@ -196,31 +330,32 @@ void criar_mapa() {
 
     for (int i = 0; i < MAPA_LINHAS; i++) {
         for (int j = 0; j < MAPA_COLUNAS; j++) {
-
+            
             if (i == pos_inicial.x && j == pos_inicial.y) {
-                visual_map[i][j] = 'S';
-                continue;
+                visual_map[i][j] = ' ';
+                continue; 
             }
 
             int e = dist_entidades(gen);
 
-            if (e == 0) { // 5% chance
+            if (e == 0 || e == 1) { // 10% chance
                 visual_map[i][j] = 'M';
                 moscas.push_back({i,j});
             }
-            else if (e > 0 && e < 5) { // 20% chance
+            else if (e > 1 && e < 6) { // 20% chance
                 visual_map[i][j] = 'B';
                 bombas.push_back({i,j});
             }
-            else if (e == 5) { // 5% chance
+            else if (e == 6 || e == 7) { // 10% chance
                 visual_map[i][j] = 'V';
                 valas.push_back({i,j});
             }
-            else { // 70% chance
+            else { // 60% chance
                 visual_map[i][j] = ' ';
             }
         }
     }
+    visual_map_base = visual_map;
 }
 
 void ver_mapa() {
@@ -239,11 +374,17 @@ void ver_mapa() {
     }
 }
 
-void follow_frog(const Frog& f) {
-    visual_map[pos_melhor_sapo.x][pos_melhor_sapo.y] = ' ';
-    visual_map[f.pos.x][f.pos.y] = 'S';
+void desenhar_melhor_sapo() {
+    // Restaura o mapa original (recupera moscas que o sapo pisou)
+    visual_map = visual_map_base; 
 
-    pos_melhor_sapo = f.pos;
+    //  Pega o melhor sapo da geração anterior (ou o 0 se for a primeira)
+    Frog& f = populacao[MELHOR_DE_TODOS];
+
+    // Desenha ele se estiver dentro do mapa
+    if(f.pos.x >= 0 && f.pos.x < MAPA_LINHAS && f.pos.y >= 0 && f.pos.y < MAPA_COLUNAS) {
+        visual_map[f.pos.x][f.pos.y] = 'S';
+    }
 }
 
 // Visão 
@@ -295,38 +436,27 @@ void visao() {
     }
 }
 
-bool eh_bomba(Coord p) {
-    return visual_map[p.x][p.y] == 'B';
-}
-
-bool eh_mosca(Coord p) {
-    return visual_map[p.x][p.y] == 'M';
-}
-
-bool eh_vala(Coord p) {
-    return visual_map[p.x][p.y] == 'V';
-}
-
 // Movimentação
 
 void movimento() {
-    for(auto &f : populacao) {
-        int contador = 0;
-        bool vetor_auxiliar[7] = {1, 0, 0, 0, 1, 1, 1}; // N, M, V, B, Rd, Re, Trás
-        if(f.ve_mosca_fe || f.ve_mosca_frente || f.ve_mosca_fd) {
-            vetor_auxiliar[1] = 1;
-            contador++;
-        }
-        if(f.ve_vala_fe ||f.ve_vala_frente || f.ve_vala_fd) {
-            vetor_auxiliar[2] = 1;
-            contador++;
-        }
-        if(f.ve_bomba_fe || f.ve_bomba_frente || f.ve_bomba_fd) {
-            vetor_auxiliar[3] = 1;
-            contador++;
-        }
-        if(contador >= 3) {
-            vetor_auxiliar[0] = 0;
+    for(int i = 0; i < populacao.size(); i++) {
+        auto &f = populacao[i];
+
+        if (!f.vivo) continue;
+
+        bool vetor_auxiliar[7] = {0, 0, 0, 0, 1, 1, 1}; // N, M, V, B, Rd, Re, Trás
+
+        int qtd_moscas  = f.ve_mosca_fe + f.ve_mosca_frente + f.ve_mosca_fd;
+        int qtd_valas   = f.ve_vala_fe  + f.ve_vala_frente  + f.ve_vala_fd;
+        int qtd_bombas  = f.ve_bomba_fe + f.ve_bomba_frente + f.ve_bomba_fd;
+
+        // Ativações baseadas na visão
+        if(qtd_moscas > 0) vetor_auxiliar[1] = 1;
+        if(qtd_valas  > 0) vetor_auxiliar[2] = 1;
+        if(qtd_bombas > 0) vetor_auxiliar[3] = 1;
+
+        if(qtd_moscas + qtd_valas + qtd_bombas < 3) {
+            vetor_auxiliar[0] = 1;
         }
 
         vector<int> movimento_real(GENES);
@@ -338,21 +468,173 @@ void movimento() {
         f.definir_movimento(movimento_real);
         f.change_position();
 
-        // Colocar os contadores pra ver se os sapos ja pisaram em algo
+        // Verficação de mapa de novo porque não aguento mais segmentation fault :( 
+        if (f.pos.x >= 0 && f.pos.x < MAPA_LINHAS && f.pos.y >= 0 && f.pos.y < MAPA_COLUNAS) {
+            
+            // Olha no mapa base para saber o que tem no chão (M, B, V)
+            char terreno = visual_map_base[f.pos.x][f.pos.y]; 
 
+            if(terreno == 'M') {
+                f.qtd_moscas++;
+                //visual_map_base[f.pos.x][f.pos.y] = ' '; 
+            }
+            else if(terreno == 'B') {
+                f.qtd_bombas++;
+                f.vivo = false;
+            }
+            else if(terreno == 'V') {
+                f.qtd_valas++;
+            }
+        }
     }
 }
 
-// Avaliar cada sapo e achar o melhor
-// Procriar eles
-// Manter o melhor e substituir o resto da população pelos novos sapos
-// Graficos em tempo real para vermos a evolução
+// Avaliação
+
+void avaliar_sapos() {
+    float a = 2.0;    // peso moscas
+    float b = 0.7;    // peso valas
+
+    score.clear();
+
+    for (int i = 0; i < populacao.size(); i++) {
+        float nota =
+            a * populacao[i].qtd_moscas +
+            b * (SALTOS_POR_GERACAO - populacao[i].qtd_valas) * (1 - populacao[i].qtd_bombas);
+
+        score.push_back(nota);
+
+        // Mantém salvo e encontra o novo melhor de todos
+        if (i == MELHOR_DE_TODOS || nota > score[MELHOR_DE_TODOS]) {
+            MELHOR_DE_TODOS = i;
+            pos_melhor_sapo = populacao[i].pos;
+        }
+    }
+}
+
+// Procriação
+
+// Elitismo 
+Frog cruzamento_elitista(const Frog& pai, const Frog& mae) {
+    vector<int> genes_filho(GENES);
+    for (int i = 0; i < GENES; i++) {
+        genes_filho[i] = (pai.movimento[i] + mae.movimento[i]) / 2;
+    }
+    return Frog(genes_filho, pos_inicial, dist_orientacao(gen));
+}
+
+// Mutação 
+void mutacao(Frog& f, int magnitude_percent) {
+    uniform_int_distribution<> prob_ocorrer(1, 100);
+    
+    uniform_int_distribution<> delta_dist(-magnitude_percent, magnitude_percent);
+
+    for (int i = 0; i < GENES; i++) {
+        if (prob_ocorrer(gen) <= CHANCE_MUTACAO) { 
+            int delta = delta_dist(gen);
+            
+            f.movimento[i] += delta;
+
+            // Garante que todo nosso trabalho não será destruido (odeio o segmentation fault)
+            if (f.movimento[i] < 1) f.movimento[i] = 1;
+            if (f.movimento[i] > 100) f.movimento[i] = 100;
+        }
+    }
+}
+
+void criar_nova_geracao(int taxa_de_mutacao) {
+    vector<Frog> nova_populacao;
+
+    // Elitismo
+    Frog melhor_sapo = populacao[MELHOR_DE_TODOS];
+    melhor_sapo.pos = pos_inicial;
+    melhor_sapo.vivo = true;
+    melhor_sapo.qtd_moscas = 0;
+    melhor_sapo.qtd_bombas = 0;
+    melhor_sapo.qtd_valas = 0;
+    nova_populacao.push_back(melhor_sapo);
+
+    // Cruzamento
+    for (int i = 0; i < TAMANHO_POP; i++) {
+        if (i == MELHOR_DE_TODOS) continue;
+        if (nova_populacao.size() >= TAMANHO_POP) break;
+
+        Frog filho = cruzamento_elitista(melhor_sapo, populacao[i]);
+        
+        mutacao(filho, taxa_de_mutacao); 
+
+        nova_populacao.push_back(filho);
+    }
+    populacao = nova_populacao;
+    MELHOR_DE_TODOS = 0; // Necessário já que trocamos a posição do melhor no novo vetor
+}
 
 int main() {
-
     populacao = criar_pop();
-    ver_pop(populacao);
+    //ver_pop(populacao);
     criar_mapa();
-    ver_mapa();
+    int geracao = 0;
 
+    score.assign(TAMANHO_POP, 0.0f); // Mais uma medida pra evitar o segmentation fault :(
+
+    while(true) {
+        for(int s = 0; s < SALTOS_POR_GERACAO; s++) {
+            // Limpa o terminal
+            system("clear"); 
+
+            // Logica de visao e movimento
+            visao();
+            movimento();
+
+            // Printa apenas o melhor sapo
+            desenhar_melhor_sapo();
+
+            // Print
+            ver_mapa();
+
+            cout << "Geracao: " << geracao << " | Salto: " << s + 1 
+                 << " | Melhor ID: " << MELHOR_DE_TODOS << endl;
+            
+            cout << "Forca Mutacao: +/-" << taxa_de_mutacao 
+                 << " (Estagnacao: " << contador_estagnacao << ")" << endl;
+
+            cout << "STATUS DO CAMPEAO:\n";
+            cout << populacao[MELHOR_DE_TODOS] 
+                 << " | Nota (anterior): " << score[MELHOR_DE_TODOS] << endl;
+
+            // Breve pausa 
+            this_thread::sleep_for(chrono::milliseconds(200));
+        }
+        // Fim da geração
+        avaliar_sapos();
+
+        float melhor_fitness_agora = score[MELHOR_DE_TODOS];
+
+        // Indicador de melhora
+        if (melhor_fitness_agora > melhor_fitness_antigo) {
+            melhor_fitness_antigo = melhor_fitness_agora;
+            contador_estagnacao = 0;
+            taxa_de_mutacao = MUTACAO_INICIAL; 
+        } 
+
+        // Indicador de estagnação
+        else {
+            contador_estagnacao++;
+            
+            // Acumula +1 de mutacao a cada 5 gerações estagnadas
+            if (contador_estagnacao > 5) {
+                taxa_de_mutacao = MUTACAO_INICIAL + contador_estagnacao/5;
+            }
+
+            // Impede taxas de mutação absurdas
+            if (taxa_de_mutacao > 20) taxa_de_mutacao = 20;
+
+            // Caso a estagnação seja muito alta, testamos uma mudança brusca
+            if (contador_estagnacao > 100) taxa_de_mutacao = 100;
+        }
+        
+        criar_nova_geracao(taxa_de_mutacao);
+        
+        geracao++;
+    }
 }
