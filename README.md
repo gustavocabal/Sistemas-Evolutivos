@@ -4,6 +4,8 @@ Este diretório contém o código e a implementação do nosso trabalho final da
 O objetivo geral do projeto foi aplicar conceitos de algoritmos evolutivos para desenvolver indivíduos capazes de interpretar o ambiente, tomar decisões inteligentes e se adaptar para maximizar sua pontuação.
 Para isso, criamos uma variação do jogo Campo Minado, habitada por sapos em evolução.
 
+Video explicando: 
+https://youtu.be/5kfnitTOW4o?si=VzprpkWwin_Tg59T
 
 ## A procura de um super sapo
 Se aprofundando nos conceito do código, podemos dividi-lo em três áreas gerais.
