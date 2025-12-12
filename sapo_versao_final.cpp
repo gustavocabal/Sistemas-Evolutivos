@@ -316,7 +316,7 @@ vector<Frog> criar_pop() {
 }
 
 void ver_pop(const vector<Frog>& pop) {
-    for (int i = 0; i < pop.size(); i++) {
+    for (long unsigned int i = 0; i < pop.size(); i++) {
         cout << pop[i];
     }
 }
@@ -440,7 +440,7 @@ void visao() {
 // Movimentação
 
 void movimento() {
-    for(int i = 0; i < populacao.size(); i++) {
+    for(long unsigned int i = 0; i < populacao.size(); i++) {
         auto &f = populacao[i];
 
         if (!f.vivo) continue;
@@ -498,7 +498,7 @@ void avaliar_sapos() {
 
     score.clear();
 
-    for (int i = 0; i < populacao.size(); i++) {
+    for (int i = 0; i < int(populacao.size()); i++) {
         float nota =
             a * populacao[i].qtd_moscas +
             b * (SALTOS_POR_GERACAO - populacao[i].qtd_valas) * (1 - populacao[i].qtd_bombas);
