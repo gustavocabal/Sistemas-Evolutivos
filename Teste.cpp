@@ -54,12 +54,19 @@ void SaveTable() {
             switch (matriz[i][j]) {
                 case 1:
                     obj["type"] = "Fly";
+                    obj["direction"] = "None";
                     break;
                 case 2:
                     obj["type"] = "mine";
+                    obj["direction"] = "None";
                     break;
                 case 3:
                     obj["type"] = "Hole";
+                    obj["direction"] = "None";
+                    break;
+                case 4:
+                    obj["type"] = "Sapo";
+                    obj["direction"] = populacao[MELHOR_DE_TODOS].orientacao;
                     break;
                 default:
                     continue;
@@ -68,7 +75,6 @@ void SaveTable() {
             obj["row"] = (int)i;
             obj["col"] = (int)j;
             obj["passo"] = 0;
-            obj["direction"] = "None";
 
             elements.push_back(obj);
         }
