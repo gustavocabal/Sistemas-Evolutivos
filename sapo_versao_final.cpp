@@ -16,8 +16,8 @@ using namespace std;
 #define MAPA_LINHAS 20
 #define MAPA_COLUNAS 20
 #define GENES 7
-#define SALTOS_POR_GERACAO 30
-#define TAMANHO_POP 100
+#define SALTOS_POR_GERACAO 50
+#define TAMANHO_POP 1000
 #define CHANCE_MUTACAO 20
 #define MUTACAO_INICIAL 4
 
@@ -70,6 +70,7 @@ class Frog {
 public:
     vector<int> movimento;
     vector<int> movimento_real;
+    vector<Coord> moscas_comidas;
     Coord pos;
     int orientacao;
     bool vivo = true;
@@ -497,8 +498,19 @@ void movimento() {
             char terreno = visual_map_base[f.pos.x][f.pos.y]; 
 
             if(terreno == 'M') {
-                f.qtd_moscas++;
-                //visual_map_base[f.pos.x][f.pos.y] = ' '; 
+                bool ja_comeu = false;
+
+                for(auto& m : f.moscas_comidas) {
+                    if(m.x == f.pos.x && m.y == f.pos.y) {
+                        ja_comeu = true;
+                        break;
+                    }
+                }
+
+                if(!ja_comeu) {
+                    f.qtd_moscas++;
+                    f.moscas_comidas.push_back(f.pos); // Salva na memória
+                }
             }
             else if(terreno == 'B') {
                 f.qtd_bombas++;
@@ -687,8 +699,12 @@ int main() {
                 populacao[pior_id].pos = posicao_segura(); 
                 populacao[pior_id].orientacao = dist_orientacao(gen);
                 populacao[pior_id].vivo = true;
+                populacao[pior_id].moscas_comidas.clear(); 
+                populacao[pior_id].qtd_moscas = 0; 
+                populacao[pior_id].qtd_bombas = 0;
+                populacao[pior_id].qtd_valas = 0;
             }
-            
+
             // Caso a estagnação seja muito alta, testamos uma mudança brusca
             if (contador_estagnacao > 100) taxa_de_mutacao = 100;
         }
