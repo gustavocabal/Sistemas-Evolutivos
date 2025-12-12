@@ -42,6 +42,7 @@ vector<Coord> moscas;
 vector<Coord> valas;
 vector<float> score;
 int MELHOR_DE_TODOS = 0;
+float nota_melhor = 0.0f;
 
 float melhor_fitness_antigo = -1.0f;
 int contador_estagnacao = 0;
@@ -338,15 +339,15 @@ void criar_mapa() {
 
             int e = dist_entidades(gen);
 
-            if (e == 0 || e == 1) { // 10% chance
+            if (e == 0 || e < 4) { // 20% chance
                 visual_map[i][j] = 'M';
                 moscas.push_back({i,j});
             }
-            else if (e > 1 && e < 6) { // 20% chance
+            else if (e > 4 && e < 9) { // 20% chance
                 visual_map[i][j] = 'B';
                 bombas.push_back({i,j});
             }
-            else if (e == 6 || e == 7) { // 10% chance
+            else if (e == 18 || e == 19) { // 10% chance
                 visual_map[i][j] = 'V';
                 valas.push_back({i,j});
             }
@@ -570,6 +571,14 @@ void criar_nova_geracao(int taxa_de_mutacao) {
 }
 
 int main() {
+    uniform_int_distribution<> d_lin(0, MAPA_LINHAS - 1);
+    uniform_int_distribution<> d_col(0, MAPA_COLUNAS - 1);
+    
+    pos_inicial.x = d_lin(gen);
+    pos_inicial.y = d_col(gen);
+    
+    pos_melhor_sapo = pos_inicial;
+
     populacao = criar_pop();
     //ver_pop(populacao);
     criar_mapa();
@@ -580,7 +589,7 @@ int main() {
     while(true) {
         for(int s = 0; s < SALTOS_POR_GERACAO; s++) {
             // Limpa o terminal
-            system("clear"); 
+            system("clear"); // Trocar pra cls se for windows 
 
             // Logica de visao e movimento
             visao();
@@ -600,13 +609,14 @@ int main() {
 
             cout << "STATUS DO CAMPEAO:\n";
             cout << populacao[MELHOR_DE_TODOS] 
-                 << " | Nota (anterior): " << score[MELHOR_DE_TODOS] << endl;
+                 << " | Nota (anterior): " << nota_melhor << endl;
 
             // Breve pausa 
             this_thread::sleep_for(chrono::milliseconds(200));
         }
         // Fim da geração
         avaliar_sapos();
+        nota_melhor = score[MELHOR_DE_TODOS];
 
         float melhor_fitness_agora = score[MELHOR_DE_TODOS];
 
