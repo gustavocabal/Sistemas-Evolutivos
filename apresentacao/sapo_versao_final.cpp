@@ -16,6 +16,7 @@
 using namespace std;
 using json = nlohmann::json;
 json elements = json::array();
+json tamanho_tabela = json::array();
 
 #define MAPA_LINHAS 20
 #define MAPA_COLUNAS 20
@@ -607,7 +608,7 @@ void criar_nova_geracao(int taxa_de_mutacao) {
     MELHOR_DE_TODOS = 0; // Necessário já que trocamos a posição do melhor no novo vetor
 }
 
-void SaveTable();
+void SaveTable(int);
 
 int main() {
     pos_inicial = aleatorizar_posicao();
@@ -628,6 +629,13 @@ int main() {
     ofstream arquivo_csv("dados_evolucao.csv");
     arquivo_csv << "Geracao,MelhorFitness,MediaFitness,RecordeHistorico,GenesR,GenesA" << endl;
 
+    json nome_aleatorio_ai;
+    json finalJson;
+    nome_aleatorio_ai["linha"] = MAPA_LINHAS;
+    nome_aleatorio_ai["colunas"] = MAPA_COLUNAS;
+    tamanho_tabela.push_back(nome_aleatorio_ai);
+    finalJson["tamanho_tabela"] = tamanho_tabela;
+
     while(true) {
         for(int s = 0; s < SALTOS_POR_GERACAO; s++) {
             // Limpa o terminal
@@ -642,7 +650,14 @@ int main() {
 
             // Print
             //ver_mapa();
-            SaveTable();
+            elements.clear();
+            SaveTable(s);
+
+            finalJson["elements"] = elements;
+            std::ofstream arquivo("Info.json");
+            arquivo << finalJson.dump(4);
+            arquivo.flush(); // Garante que escreveu agora
+            arquivo.close();
 
             cout << "Geracao: " << geracao << " | Salto: " << s + 1 
                  << " | Melhor ID: " << MELHOR_DE_TODOS << endl;
@@ -764,44 +779,39 @@ int main() {
     }
 }
 
-void SaveTable() {
-
-    // limpa elementos antes de preencher
-    // caso contrário JSON acumula dados
-     elements.clear();
+void SaveTable(int s) {
+    // NÃO USE elements.clear() AQUI DENTRO. Faremos na main.
 
     for (size_t i = 0; i < MAPA_LINHAS; i++) {
         for (size_t j = 0; j < MAPA_COLUNAS; j++) {
 
-            if (visual_map[i][j] == ' ')
-                continue;
+            if (visual_map[i][j] == ' ') continue;
 
-            json obj;  // Criado apenas 1 vez por célula
+            json obj;
 
+            // 1. Salva o Tipo
             switch (visual_map[i][j]) {
-                case 'M':
-                    obj["type"] = "Fly";
-                    obj["direction"] = "None";
-                    break;
-                case 'B':
-                    obj["type"] = "mine";
-                    obj["direction"] = "None";
-                    break;
-                case 'V':
-                    obj["type"] = "Hole";
-                    obj["direction"] = "None";
-                    break;
-                case 'S':
+                case 'M': obj["type"] = "Fly";  obj["direction"] = "None"; break;
+                case 'B': obj["type"] = "mine"; obj["direction"] = "None"; break;
+                case 'V': obj["type"] = "Hole"; obj["direction"] = "None"; break;
+                case 'S': 
                     obj["type"] = "Sapo";
-                    obj["direction"] = populacao[MELHOR_DE_TODOS].orientacao;
+                    // Converte orientação numérica para String pro JS
+                    switch(populacao[MELHOR_DE_TODOS].orientacao) {
+                        case 0: obj["direction"] = "Back"; break;
+                        case 1: obj["direction"] = "Right"; break;
+                        case 2: obj["direction"] = "Front"; break;
+                        case 3: obj["direction"] = "Left"; break;
+                        default: obj["direction"] = "Front";
+                    }
                     break;
-                default:
-                    continue;
+                default: continue;
             }
 
+            // 2. Salva Posição
             obj["row"] = (int)i;
             obj["col"] = (int)j;
-            obj["passo"] = 0;
+            obj["passo"] = s; // Opcional pro JS novo, mas bom manter
 
             elements.push_back(obj);
         }

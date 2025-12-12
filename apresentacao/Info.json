@@ -1,21 +1,1452 @@
 {
     "elements": [
-        { "type": "Fly",  "row": 0, "col": 4 },
-        { "type": "Fly",  "row": 6, "col": 1 },
-        { "type": "Hole", "row": 1, "col": 1 },
-        { "type": "Hole", "row": 4, "col": 6 },
-        { "type": "mine", "row": 0, "col": 7 },
-        { "type": "mine", "row": 7, "col": 0 },
-        { "type": "Sapo", "row": 4, "col": 4 , "passo": 0 ,"direction": "Right" },
-        { "type": "Sapo", "row": 4, "col": 5 , "passo": 1 ,"direction": "Right" },
-        { "type": "Sapo", "row": 4, "col": 6 , "passo": 2 ,"direction": "Right" },
-        { "type": "Sapo", "row": 4, "col": 7 , "passo": 3 ,"direction": "Right" },
-        { "type": "Sapo", "row": 3, "col": 7 , "passo": 4 ,"direction": "Back" },
-        { "type": "Sapo", "row": 2, "col": 7 , "passo": 5 ,"direction": "Back" },
-        { "type": "Sapo", "row": 1, "col": 7 , "passo": 6 ,"direction": "Back" },
-        { "type": "Sapo", "row": 0, "col": 7 , "passo": 7 ,"direction": "Back" },
-        { "type": "Sapo", "row": 0, "col": 6 , "passo": 8 ,"direction": "Left" },
-        { "type": "Sapo", "row": 0, "col": 5 , "passo": 9 ,"direction": "Left" },
-        { "type": "Sapo", "row": 0, "col": 4 , "passo": 10 ,"direction": "Left" }
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "Fly"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "mine"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "Fly"
+        },
+        {
+            "col": 10,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "Hole"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "Fly"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "mine"
+        },
+        {
+            "col": 16,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "Fly"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "Hole"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "Fly"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 0,
+            "type": "Fly"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 1,
+            "type": "Hole"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 1,
+            "type": "Hole"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 1,
+            "type": "mine"
+        },
+        {
+            "col": 8,
+            "direction": "Front",
+            "passo": 32,
+            "row": 1,
+            "type": "Sapo"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 1,
+            "type": "Fly"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 1,
+            "type": "Fly"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 1,
+            "type": "Fly"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 1,
+            "type": "Fly"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "Fly"
+        },
+        {
+            "col": 2,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "Hole"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "mine"
+        },
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "mine"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "mine"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "Hole"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "Fly"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "Fly"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "mine"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "Hole"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "Hole"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 2,
+            "type": "mine"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 3,
+            "type": "mine"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 3,
+            "type": "Fly"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 3,
+            "type": "mine"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 3,
+            "type": "mine"
+        },
+        {
+            "col": 10,
+            "direction": "None",
+            "passo": 32,
+            "row": 3,
+            "type": "Fly"
+        },
+        {
+            "col": 16,
+            "direction": "None",
+            "passo": 32,
+            "row": 3,
+            "type": "mine"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 3,
+            "type": "mine"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 3,
+            "type": "Fly"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "Fly"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "mine"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "mine"
+        },
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "mine"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "mine"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "Fly"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "mine"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "Fly"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "Fly"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "Fly"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "Fly"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 4,
+            "type": "Fly"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 5,
+            "type": "mine"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 5,
+            "type": "Fly"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 5,
+            "type": "mine"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 5,
+            "type": "mine"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 5,
+            "type": "Hole"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 5,
+            "type": "Fly"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 5,
+            "type": "mine"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 5,
+            "type": "Fly"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 6,
+            "type": "mine"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 6,
+            "type": "Hole"
+        },
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 6,
+            "type": "mine"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 6,
+            "type": "mine"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 6,
+            "type": "Hole"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 6,
+            "type": "mine"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 6,
+            "type": "Hole"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 6,
+            "type": "mine"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "Fly"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "Hole"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "Fly"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "Fly"
+        },
+        {
+            "col": 10,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "mine"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "mine"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "Fly"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 7,
+            "type": "mine"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "Fly"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "mine"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "Fly"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "Fly"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "Fly"
+        },
+        {
+            "col": 10,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "Fly"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "Hole"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "Fly"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 8,
+            "type": "mine"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "Hole"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "mine"
+        },
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "mine"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "mine"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "mine"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "mine"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "Fly"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "mine"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 9,
+            "type": "Fly"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 10,
+            "type": "Fly"
+        },
+        {
+            "col": 2,
+            "direction": "None",
+            "passo": 32,
+            "row": 10,
+            "type": "Fly"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 10,
+            "type": "Fly"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 10,
+            "type": "Fly"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 10,
+            "type": "mine"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 10,
+            "type": "Fly"
+        },
+        {
+            "col": 16,
+            "direction": "None",
+            "passo": 32,
+            "row": 10,
+            "type": "Hole"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 10,
+            "type": "Fly"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Hole"
+        },
+        {
+            "col": 2,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Hole"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "mine"
+        },
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "mine"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "mine"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Hole"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Fly"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Fly"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "mine"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Hole"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Hole"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "mine"
+        },
+        {
+            "col": 16,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "mine"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Fly"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Fly"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 11,
+            "type": "Fly"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Hole"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "mine"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Hole"
+        },
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Fly"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "mine"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Fly"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Hole"
+        },
+        {
+            "col": 10,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "mine"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Fly"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "mine"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Hole"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Fly"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "mine"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 12,
+            "type": "Hole"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 13,
+            "type": "mine"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 13,
+            "type": "Fly"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 13,
+            "type": "Fly"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 13,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 13,
+            "type": "Fly"
+        },
+        {
+            "col": 16,
+            "direction": "None",
+            "passo": 32,
+            "row": 13,
+            "type": "mine"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 13,
+            "type": "mine"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "Fly"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "Fly"
+        },
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "mine"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "Fly"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "Fly"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "mine"
+        },
+        {
+            "col": 10,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "mine"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "Fly"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "Fly"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "mine"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "Fly"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 14,
+            "type": "Fly"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 15,
+            "type": "mine"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 15,
+            "type": "Hole"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 15,
+            "type": "mine"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 15,
+            "type": "mine"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 15,
+            "type": "Fly"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 15,
+            "type": "mine"
+        },
+        {
+            "col": 16,
+            "direction": "None",
+            "passo": 32,
+            "row": 15,
+            "type": "Hole"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "Hole"
+        },
+        {
+            "col": 2,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "Hole"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "Fly"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "Fly"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "mine"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "mine"
+        },
+        {
+            "col": 16,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "Fly"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 16,
+            "type": "mine"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "Fly"
+        },
+        {
+            "col": 1,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "mine"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "Fly"
+        },
+        {
+            "col": 5,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "Hole"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "mine"
+        },
+        {
+            "col": 10,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "mine"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "Fly"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "Fly"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "Fly"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "mine"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 17,
+            "type": "Fly"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "Hole"
+        },
+        {
+            "col": 2,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "Fly"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "mine"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "mine"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "mine"
+        },
+        {
+            "col": 11,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "Hole"
+        },
+        {
+            "col": 12,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "Hole"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "mine"
+        },
+        {
+            "col": 15,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "mine"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "Hole"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "Hole"
+        },
+        {
+            "col": 19,
+            "direction": "None",
+            "passo": 32,
+            "row": 18,
+            "type": "mine"
+        },
+        {
+            "col": 0,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "Fly"
+        },
+        {
+            "col": 3,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "Fly"
+        },
+        {
+            "col": 4,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "Fly"
+        },
+        {
+            "col": 6,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "Fly"
+        },
+        {
+            "col": 7,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "mine"
+        },
+        {
+            "col": 8,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "Fly"
+        },
+        {
+            "col": 9,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "mine"
+        },
+        {
+            "col": 13,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "mine"
+        },
+        {
+            "col": 14,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "Hole"
+        },
+        {
+            "col": 16,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "mine"
+        },
+        {
+            "col": 17,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "Fly"
+        },
+        {
+            "col": 18,
+            "direction": "None",
+            "passo": 32,
+            "row": 19,
+            "type": "Fly"
+        }
+    ],
+    "tamanho_tabela": [
+        {
+            "colunas": 20,
+            "linha": 20
+        }
     ]
 }
