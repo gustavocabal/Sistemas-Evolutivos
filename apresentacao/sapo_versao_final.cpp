@@ -1,3 +1,4 @@
+#include "json.hpp"
 #include <iomanip>
 #include <iostream>
 #include <time.h>
@@ -13,6 +14,8 @@
 #include <fstream>
 
 using namespace std;
+using json = nlohmann::json;
+json elements = json::array();
 
 #define MAPA_LINHAS 20
 #define MAPA_COLUNAS 20
@@ -604,6 +607,8 @@ void criar_nova_geracao(int taxa_de_mutacao) {
     MELHOR_DE_TODOS = 0; // Necessário já que trocamos a posição do melhor no novo vetor
 }
 
+void SaveTable();
+
 int main() {
     pos_inicial = aleatorizar_posicao();
     pos_melhor_sapo = pos_inicial;
@@ -636,7 +641,8 @@ int main() {
             desenhar_melhor_sapo();
 
             // Print
-            ver_mapa();
+            //ver_mapa();
+            SaveTable();
 
             cout << "Geracao: " << geracao << " | Salto: " << s + 1 
                  << " | Melhor ID: " << MELHOR_DE_TODOS << endl;
@@ -755,5 +761,49 @@ int main() {
         criar_nova_geracao(taxa_de_mutacao);
         
         geracao++;
+    }
+}
+
+void SaveTable() {
+
+    // limpa elementos antes de preencher
+    // caso contrário JSON acumula dados
+     elements.clear();
+
+    for (size_t i = 0; i < MAPA_LINHAS; i++) {
+        for (size_t j = 0; j < MAPA_COLUNAS; j++) {
+
+            if (visual_map[i][j] == ' ')
+                continue;
+
+            json obj;  // Criado apenas 1 vez por célula
+
+            switch (visual_map[i][j]) {
+                case 'M':
+                    obj["type"] = "Fly";
+                    obj["direction"] = "None";
+                    break;
+                case 'B':
+                    obj["type"] = "mine";
+                    obj["direction"] = "None";
+                    break;
+                case 'V':
+                    obj["type"] = "Hole";
+                    obj["direction"] = "None";
+                    break;
+                case 'S':
+                    obj["type"] = "Sapo";
+                    obj["direction"] = populacao[MELHOR_DE_TODOS].orientacao;
+                    break;
+                default:
+                    continue;
+            }
+
+            obj["row"] = (int)i;
+            obj["col"] = (int)j;
+            obj["passo"] = 0;
+
+            elements.push_back(obj);
+        }
     }
 }
