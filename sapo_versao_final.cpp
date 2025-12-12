@@ -16,8 +16,8 @@ using namespace std;
 #define MAPA_LINHAS 20
 #define MAPA_COLUNAS 20
 #define GENES 7
-#define SALTOS_POR_GERACAO 20
-#define TAMANHO_POP 10
+#define SALTOS_POR_GERACAO 30
+#define TAMANHO_POP 100
 #define CHANCE_MUTACAO 20
 #define MUTACAO_INICIAL 4
 
@@ -33,7 +33,7 @@ struct Coord {
     int y;
 };
 
-Coord pos_inicial = {MAPA_LINHAS/2, MAPA_COLUNAS/2}; // mudar depois pra ser aletorio
+Coord pos_inicial = {MAPA_LINHAS/2, MAPA_COLUNAS/2}; 
 Coord pos_melhor_sapo = pos_inicial;
 vector<vector<char>> visual_map;
 vector<vector<char>> visual_map_base; 
@@ -43,6 +43,7 @@ vector<Coord> valas;
 vector<float> score;
 int MELHOR_DE_TODOS = 0;
 float nota_melhor = 0.0f;
+vector<int> genes_recordista;
 
 float melhor_fitness_antigo = -1.0f;
 int contador_estagnacao = 0;
@@ -299,6 +300,12 @@ public:
 // Gerar população
 vector<Frog> populacao;
 
+Coord aleatorizar_posicao() {
+    uniform_int_distribution<> d_lin(0, MAPA_LINHAS - 1);
+    uniform_int_distribution<> d_col(0, MAPA_COLUNAS - 1);
+    return {d_lin(gen),d_col(gen)};
+}
+
 vector<int> criar_mov() {
     vector<int> mov(GENES);
     for (int i = 0; i < GENES; i++) {
@@ -310,13 +317,13 @@ vector<int> criar_mov() {
 vector<Frog> criar_pop() {
     vector<Frog> pop;
     for (int i = 0; i < TAMANHO_POP; i++) {
-        pop.emplace_back(criar_mov(), pos_inicial, dist_orientacao(gen));
+        pop.emplace_back(criar_mov(), aleatorizar_posicao(), dist_orientacao(gen));
     }
     return pop;
 }
 
 void ver_pop(const vector<Frog>& pop) {
-    for (long unsigned int i = 0; i < pop.size(); i++) {
+    for (int i = 0; i < pop.size(); i++) {
         cout << pop[i];
     }
 }
@@ -357,6 +364,20 @@ void criar_mapa() {
         }
     }
     visual_map_base = visual_map;
+}
+
+Coord posicao_segura() {
+    int tentativas = 0;
+    Coord pos;
+
+    // Tenta sortear uma posição até achar um Espaço Vazio (' ')
+    do {
+        pos = aleatorizar_posicao();
+        tentativas++;
+        if (tentativas > 500) break; // Evita travar se o mapa estiver cheio
+    } while (visual_map[pos.x][pos.y] != ' '); 
+
+    return pos;
 }
 
 void ver_mapa() {
@@ -440,7 +461,7 @@ void visao() {
 // Movimentação
 
 void movimento() {
-    for(long unsigned int i = 0; i < populacao.size(); i++) {
+    for(int i = 0; i < populacao.size(); i++) {
         auto &f = populacao[i];
 
         if (!f.vivo) continue;
@@ -498,9 +519,9 @@ void avaliar_sapos() {
 
     score.clear();
 
-    for (int i = 0; i < int(populacao.size()); i++) {
+    for (int i = 0; i < populacao.size(); i++) {
         float nota =
-            a * populacao[i].qtd_moscas +
+            a * (populacao[i].qtd_moscas) +
             b * (SALTOS_POR_GERACAO - populacao[i].qtd_valas) * (1 - populacao[i].qtd_bombas);
 
         score.push_back(nota);
@@ -521,7 +542,7 @@ Frog cruzamento_elitista(const Frog& pai, const Frog& mae) {
     for (int i = 0; i < GENES; i++) {
         genes_filho[i] = (pai.movimento[i] + mae.movimento[i]) / 2;
     }
-    return Frog(genes_filho, pos_inicial, dist_orientacao(gen));
+    return Frog(genes_filho, posicao_segura(), dist_orientacao(gen));
 }
 
 // Mutação 
@@ -548,7 +569,7 @@ void criar_nova_geracao(int taxa_de_mutacao) {
 
     // Elitismo
     Frog melhor_sapo = populacao[MELHOR_DE_TODOS];
-    melhor_sapo.pos = pos_inicial;
+    melhor_sapo.pos = posicao_segura();
     melhor_sapo.vivo = true;
     melhor_sapo.qtd_moscas = 0;
     melhor_sapo.qtd_bombas = 0;
@@ -571,17 +592,20 @@ void criar_nova_geracao(int taxa_de_mutacao) {
 }
 
 int main() {
-    uniform_int_distribution<> d_lin(0, MAPA_LINHAS - 1);
-    uniform_int_distribution<> d_col(0, MAPA_COLUNAS - 1);
     
-    pos_inicial.x = d_lin(gen);
-    pos_inicial.y = d_col(gen);
+    pos_inicial = aleatorizar_posicao();
     
     pos_melhor_sapo = pos_inicial;
 
+    float recorde_historico = 0.0f;
     populacao = criar_pop();
     //ver_pop(populacao);
     criar_mapa();
+
+    for (int i = 0; i < TAMANHO_POP; i++) {
+        populacao[i].pos = posicao_segura();
+    }
+
     int geracao = 0;
 
     score.assign(TAMANHO_POP, 0.0f); // Mais uma medida pra evitar o segmentation fault :(
@@ -609,7 +633,13 @@ int main() {
 
             cout << "STATUS DO CAMPEAO:\n";
             cout << populacao[MELHOR_DE_TODOS] 
-                 << " | Nota (anterior): " << nota_melhor << endl;
+                 << " | Nota do melhor da geracao: " << nota_melhor <<
+                 "\n | Recorde historico: " << recorde_historico << endl;
+            if (!genes_recordista.empty()) {
+                cout << " | Genes do recordista: [ ";
+                for(int g : genes_recordista) cout << g << " ";
+                cout << "]" << endl;
+            }
 
             // Breve pausa 
             this_thread::sleep_for(chrono::milliseconds(200));
@@ -620,7 +650,7 @@ int main() {
 
         float melhor_fitness_agora = score[MELHOR_DE_TODOS];
 
-        // Indicador de melhora
+        // Indicador de tendencia de melhora
         if (melhor_fitness_agora > melhor_fitness_antigo) {
             melhor_fitness_antigo = melhor_fitness_agora;
             contador_estagnacao = 0;
@@ -639,10 +669,39 @@ int main() {
             // Impede taxas de mutação absurdas
             if (taxa_de_mutacao > 20) taxa_de_mutacao = 20;
 
+            if (contador_estagnacao == 50 && !genes_recordista.empty()) {
+                
+                // Encontrar o índice do PIOR sapo da geração atual
+                int pior_id = 0;
+                float pior_nota = score[0];
+                
+                for(int i = 1; i < TAMANHO_POP; i++) {
+                    if (score[i] < pior_nota) {
+                        pior_nota = score[i];
+                        pior_id = i;
+                    }
+                }
+
+                // Substitui DNA do pior pelo DNA do recordista
+                populacao[pior_id].movimento = genes_recordista;
+                populacao[pior_id].pos = posicao_segura(); 
+                populacao[pior_id].orientacao = dist_orientacao(gen);
+                populacao[pior_id].vivo = true;
+            }
+            
             // Caso a estagnação seja muito alta, testamos uma mudança brusca
             if (contador_estagnacao > 100) taxa_de_mutacao = 100;
         }
         
+        if (melhor_fitness_agora > recorde_historico) {
+            recorde_historico = melhor_fitness_agora;
+            genes_recordista = populacao[MELHOR_DE_TODOS].movimento;
+        }
+        /* Salva o melhor do momento para indicar uma tendencia de melhora,
+        já que as vezes é difícil para os novos sapos superarem o recorde de um 
+        sapo muito sortudo */
+        melhor_fitness_antigo = melhor_fitness_agora;
+
         criar_nova_geracao(taxa_de_mutacao);
         
         geracao++;
