@@ -1,0 +1,21 @@
+{
+    "elements": [
+        { "type": "Fly",  "row": 0, "col": 4 },
+        { "type": "Fly",  "row": 6, "col": 1 },
+        { "type": "Hole", "row": 1, "col": 1 },
+        { "type": "Hole", "row": 4, "col": 6 },
+        { "type": "mine", "row": 0, "col": 7 },
+        { "type": "mine", "row": 7, "col": 0 },
+        { "type": "Sapo", "row": 4, "col": 4 , "passo": 0 ,"direction": "Right" },
+        { "type": "Sapo", "row": 4, "col": 5 , "passo": 1 ,"direction": "Right" },
+        { "type": "Sapo", "row": 4, "col": 6 , "passo": 2 ,"direction": "Right" },
+        { "type": "Sapo", "row": 4, "col": 7 , "passo": 3 ,"direction": "Right" },
+        { "type": "Sapo", "row": 3, "col": 7 , "passo": 4 ,"direction": "Back" },
+        { "type": "Sapo", "row": 2, "col": 7 , "passo": 5 ,"direction": "Back" },
+        { "type": "Sapo", "row": 1, "col": 7 , "passo": 6 ,"direction": "Back" },
+        { "type": "Sapo", "row": 0, "col": 7 , "passo": 7 ,"direction": "Back" },
+        { "type": "Sapo", "row": 0, "col": 6 , "passo": 8 ,"direction": "Left" },
+        { "type": "Sapo", "row": 0, "col": 5 , "passo": 9 ,"direction": "Left" },
+        { "type": "Sapo", "row": 0, "col": 4 , "passo": 10 ,"direction": "Left" }
+    ]
+}
